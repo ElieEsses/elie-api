@@ -1,5 +1,7 @@
-from pydantic import BaseModel, ConfigDict, Field
 from typing import Literal
+
+from pydantic import BaseModel, ConfigDict, Field
+
 
 class BookData(BaseModel):
     isbn: str | None = None

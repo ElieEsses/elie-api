@@ -3,7 +3,12 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException
 
 import app.repositories.books as books
-from app.models.models import BookData, BookResponse, BookDetailResponse, ReadingProgressUpdate
+from app.models.models import (
+    BookData,
+    BookDetailResponse,
+    BookResponse,
+    ReadingProgressUpdate,
+)
 from app.services.auth import get_current_user_id
 from app.services.book_lookup import get_book_data
 
@@ -58,3 +63,4 @@ def update_reading_progress(
         raise HTTPException(status_code=404, detail="Book not found")
 
     return result
+

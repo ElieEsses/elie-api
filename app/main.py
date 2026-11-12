@@ -8,12 +8,14 @@ app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "http://localhost:5173",
-        "http://10.1.130.17:5173",
-        "https://tooth-overall-rocks-quit.trycloudflare.com"
+        "http://localhost:5173"
     ],
     allow_methods=["GET", "POST", "PATCH", "DELETE"],
     allow_headers=["Authorization", "Content-Type"],
 )
+
+@app.get("/health", tags=["Health"])
+def root():
+    return {"status": "healthy"}
 
 app.include_router(books_router)

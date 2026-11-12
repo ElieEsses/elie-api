@@ -4,7 +4,12 @@ from sqlalchemy import select
 
 from app.db.database import get_session
 from app.db.db_models import Book, Library
-from app.models.models import BookData, BookResponse, BookDetailResponse, ReadingProgressUpdate
+from app.models.models import (
+    BookData,
+    BookDetailResponse,
+    BookResponse,
+    ReadingProgressUpdate,
+)
 
 
 def get_all(user_id: UUID):
