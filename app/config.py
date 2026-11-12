@@ -2,6 +2,8 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
+    frontend_url: str
+    
     google_api_key: str
     google_books_url: str = "https://www.googleapis.com/books/v1/volumes"
 
