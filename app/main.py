@@ -1,4 +1,4 @@
-from config import config
+from app.config import config
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
