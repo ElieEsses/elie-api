@@ -1,0 +1,60 @@
+from uuid import UUID
+
+from fastapi import APIRouter, Depends, HTTPException
+
+import app.repositories.books as books
+from app.models.models import BookData, BookResponse, BookDetailResponse, ReadingProgressUpdate
+from app.services.auth import get_current_user_id
+from app.services.book_lookup import get_book_data
+
+router = APIRouter(prefix="/books", tags=["Books"])
+
+@router.get("", response_model=list[BookResponse])
+def get_books(user_id: UUID = Depends(get_current_user_id)):
+    """
+    Get all books for the current user.
+    """
+    return books.get_all(user_id)
+
+@router.get("/{book_id}", response_model=BookDetailResponse)
+def get_book(book_id: int, user_id: UUID = Depends(get_current_user_id)):
+    """
+    Get a specific book by its ID for the current user.
+    """
+    book = books.get_by_id(user_id, book_id)
+    if not book:
+        raise HTTPException(status_code=404, detail="Book not found")
+    return book
+
+@router.get("/lookup/{isbn}", 
+            response_model=BookData | None, 
+            dependencies=[Depends(get_current_user_id)]
+            )
+def book_lookup(isbn: str) -> BookData | None:
+    """
+    Look up a book by its ISBN using the Google Books API and Open Library API.
+    """
+    return get_book_data(isbn)
+
+@router.post("", response_model=BookResponse)
+def add_book(book_data: BookData, user_id: UUID = Depends(get_current_user_id)):
+    """
+    Add a book to the current user's library.
+    """
+    try:
+        return books.add(user_id, book_data)
+    except ValueError as e:
+        raise HTTPException(status_code=409, detail=str(e)) from e
+    
+@router.patch("/{book_id}", response_model=BookDetailResponse)
+def update_reading_progress(
+    book_id: int,
+    update: ReadingProgressUpdate,
+    user_id: UUID = Depends(get_current_user_id),
+):
+    result = books.update_progress(user_id, book_id, update)
+
+    if result is None:
+        raise HTTPException(status_code=404, detail="Book not found")
+
+    return result
