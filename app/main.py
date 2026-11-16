@@ -1,10 +1,12 @@
-from app.config import config
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.books import router as books_router
+from app.config import config
 
-app = FastAPI()
+app = FastAPI(
+    title="Digital Library API",
+)
 
 app.add_middleware(
     CORSMiddleware,

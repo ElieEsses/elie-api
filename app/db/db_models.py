@@ -32,3 +32,4 @@ class Library(Base):
     book_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("books.id"), primary_key=True)
     status: Mapped[str] = mapped_column(nullable=False, default="unread")
     pages_read: Mapped[int] = mapped_column(nullable=False, default=0)
+    nfc_url: Mapped[str] = mapped_column(nullable=False, default="https://library.app.elie-esses.com/library")

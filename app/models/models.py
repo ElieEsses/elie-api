@@ -25,6 +25,7 @@ class BookResponse(BaseModel):
 class BookDetailResponse(BookResponse):
     status: str
     pages_read: int
+    nfc_url: str
 
 class ReadingProgressUpdate(BaseModel):
     status: Literal["unread", "reading", "finished"] | None = None
