@@ -1,5 +1,5 @@
 from typing import Literal
-
+from uuid import UUID
 from pydantic import BaseModel, ConfigDict, Field
 
 
@@ -25,8 +25,17 @@ class BookResponse(BaseModel):
 class BookDetailResponse(BookResponse):
     status: str
     pages_read: int
-    nfc_url: str
+    nfc_url: str | None = None
 
 class ReadingProgressUpdate(BaseModel):
     status: Literal["unread", "reading", "finished"] | None = None
     pages_read: int | None = Field(default=None, ge=0)
+
+class LibraryEntryResponse(BaseModel):
+    user_id: UUID
+    book_id: int
+    status: str
+    pages_read: int
+    nfc_url: str | None = None
+
+    model_config = ConfigDict(from_attributes=True)

@@ -40,7 +40,7 @@ def get_by_id(user_id: UUID, book_id: int):
             **BookResponse.model_validate(book).model_dump(),
             status=library_entry.status,
             pages_read=library_entry.pages_read,
-            nfc_url=library_entry.nfc_url
+            nfc_url=library_entry.nfc_url,
         )
     
 def add(user_id: UUID, book_data: BookData):
@@ -65,12 +65,12 @@ def add(user_id: UUID, book_data: BookData):
         # if the book is not in the user's library, add it
         nfc_url = f"https://library.app.elie-esses.com/library/{book.id}"
         library_entry = Library(user_id=user_id, book_id=book.id, nfc_url=nfc_url)
+        
         session.add(library_entry)
-
-        # commit the transaction
+        book_id = book.id
         session.commit()
-        session.refresh(book)
-        return book
+
+    return get_by_id(user_id, book_id)
 
 def update_progress(user_id: UUID, book_id: int, update: ReadingProgressUpdate):
     with get_session() as session:

@@ -8,6 +8,7 @@ from app.models.models import (
     BookDetailResponse,
     BookResponse,
     ReadingProgressUpdate,
+    LibraryEntryResponse
 )
 from app.services.auth import get_current_user_id
 from app.services.book_lookup import get_book_data
@@ -41,7 +42,7 @@ def book_lookup(isbn: str) -> BookData | None:
     """
     return get_book_data(isbn)
 
-@router.post("", response_model=BookResponse)
+@router.post("", response_model=BookDetailResponse)
 def add_book(book_data: BookData, user_id: UUID = Depends(get_current_user_id)):
     """
     Add a book to the current user's library.
