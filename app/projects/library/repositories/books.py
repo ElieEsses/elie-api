@@ -2,14 +2,14 @@ from uuid import UUID
 
 from sqlalchemy import select
 
-from app.db.database import get_session
-from app.db.db_models import Book, Library
-from app.models.models import (
+from app.projects.library.db.db_models import Book, Library
+from app.projects.library.models.models import (
     BookData,
     BookDetailResponse,
     BookResponse,
     ReadingProgressUpdate,
 )
+from app.shared.database import get_session
 
 
 def get_all(user_id: UUID):

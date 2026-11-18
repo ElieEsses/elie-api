@@ -1,7 +1,7 @@
 import requests
 
 from app.config import config
-from app.models.models import BookData
+from app.projects.library.models.models import BookData
 
 
 def get_book_data(isbn: str) -> BookData | None:

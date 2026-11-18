@@ -1,11 +1,12 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.books import router as books_router
 from app.config import config
+from app.projects.library.api.books import router as books_router
+from app.projects.water.api.water import router as water_router
 
 app = FastAPI(
-    title="Digital Library API",
+    title="Elie's Project APIs",
 )
 
 app.add_middleware(
@@ -22,3 +23,4 @@ def root():
     return {"status": "healthy"}
 
 app.include_router(books_router)
+app.include_router(water_router)

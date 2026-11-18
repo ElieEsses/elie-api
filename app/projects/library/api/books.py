@@ -2,17 +2,17 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException
 
-import app.repositories.books as books
-from app.models.models import (
+import app.projects.library.repositories.books as books
+from app.projects.library.models.models import (
     BookData,
     BookDetailResponse,
     BookResponse,
     ReadingProgressUpdate,
 )
-from app.services.auth import get_current_user_id
-from app.services.book_lookup import get_book_data
+from app.projects.library.services.book_lookup import get_book_data
+from app.shared.auth import get_current_user_id
 
-router = APIRouter(prefix="/books", tags=["Books"])
+router = APIRouter(prefix="/books", tags=["Digital Library"])
 
 @router.get("", response_model=list[BookResponse])
 def get_books(user_id: UUID = Depends(get_current_user_id)):
