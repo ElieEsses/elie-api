@@ -2,11 +2,12 @@ from uuid import UUID
 
 from sqlalchemy import select
 
-from app.projects.library.db.db_models import Book, Library
+from app.projects.library.db.db_models import Book, Library, Note
 from app.projects.library.models.models import (
     BookData,
     BookDetailResponse,
     BookResponse,
+    NoteCreate,
     ReadingProgressUpdate,
 )
 from app.shared.database import get_session
@@ -104,9 +105,7 @@ def update_details(user_id: UUID, book_id: int, book_data: BookData):
 
         session.commit()
 
-    print(user_id, book_id)
     result = get_by_id(user_id, book_id)
-    print(result)
     return result
 
 
@@ -146,3 +145,49 @@ def update_progress(user_id: UUID, book_id: int, update: ReadingProgressUpdate):
         session.commit()
 
         return get_by_id(user_id, book_id)
+
+def get_notes(user_id: UUID, book_id: int):
+    with get_session() as session:
+        query = (
+            select(Note)
+            .where(Note.user_id == user_id, Note.book_id == book_id)
+        )
+        return session.scalars(query).all()
+
+def add_note(user_id: UUID, book_id: int, note_data: NoteCreate):
+    with get_session() as session:
+        note = Note(
+            user_id=user_id,
+            book_id=book_id,
+            content=note_data.content
+        )
+        session.add(note)
+        session.commit()
+        session.refresh(note)
+
+    return note
+
+def delete_note(user_id: UUID, book_id: int, note_id: int):
+    with get_session() as session:
+        note = session.get(Note, note_id)
+
+        if note is None or note.user_id != user_id or note.book_id != book_id:
+            return None
+
+        session.delete(note)
+        session.commit()
+
+    return True
+
+def update_note(user_id: UUID, book_id: int, note_id: int, note_data: NoteCreate):
+    with get_session() as session:
+        note = session.get(Note, note_id)
+
+        if note is None or note.user_id != user_id or note.book_id != book_id:
+            return None
+
+        note.content = note_data.content
+        session.commit()
+        session.refresh(note)
+
+    return note

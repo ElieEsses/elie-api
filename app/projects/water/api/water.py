@@ -16,6 +16,9 @@ router = APIRouter(prefix="/water", tags=["Water"])
     dependencies=[Depends(get_current_user_id)],
 )
 def get_textbelt_quota():
+    """
+    Get the remaining text message quota from Textbelt.
+    """
     response = requests.get(
         f"https://textbelt.com/quota/{config.textbelt_api_key}",
         timeout=10,

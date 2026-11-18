@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
@@ -35,14 +36,13 @@ class ReadingProgressUpdate(BaseModel):
     pages_read: int | None = Field(default=None, ge=0)
 
 
-class NoteData(BaseModel):
+class NoteCreate(BaseModel):
     content: str
 
 
-class NoteResponse(NoteData):
+class NoteResponse(BaseModel):
     id: int
-    user_id: str
-    book_id: int
-    created_at: str
+    content: str
+    created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)

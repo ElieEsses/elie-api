@@ -7,6 +7,8 @@ from app.projects.library.models.models import (
     BookData,
     BookDetailResponse,
     BookResponse,
+    NoteCreate,
+    NoteResponse,
     ReadingProgressUpdate,
 )
 from app.projects.library.services.book_lookup import get_book_data
@@ -93,9 +95,60 @@ def update_reading_progress(
     update: ReadingProgressUpdate,
     user_id: UUID = Depends(get_current_user_id),
 ):
+    """
+    Update the reading progress of a specific book in the current user's library.
+    """
     result = books.update_progress(user_id, book_id, update)
 
     if result is None:
         raise HTTPException(status_code=404, detail="Book not found")
 
     return result
+
+@router.get("/{book_id}/notes", response_model=list[NoteResponse])
+def get_notes(book_id: int, user_id: UUID = Depends(get_current_user_id)):
+    """
+    Get all notes for a specific book in the current user's library.
+    """
+    result = books.get_notes(user_id, book_id)
+
+    if result is None:
+        raise HTTPException(status_code=404, detail="Book not found")
+
+    return result
+
+@router.post("/{book_id}/notes", response_model=NoteResponse)
+def add_note(book_id: int, note_data: NoteCreate, user_id: UUID = Depends(get_current_user_id)):
+    """
+    Add a note to a specific book in the current user's library.
+    """
+    result = books.add_note(user_id, book_id, note_data)
+    
+    if result is None:
+        raise HTTPException(status_code=404, detail="Book not found")
+
+    return result
+
+@router.patch("/{book_id}/notes/{note_id}", response_model=NoteResponse)
+def update_note(book_id: int, note_id: int, note_data: NoteCreate, user_id: UUID = Depends(get_current_user_id)):
+    """
+    Update a note for a specific book in the current user's library.
+    """
+    result = books.update_note(user_id, book_id, note_id, note_data)
+    
+    if result is None:
+        raise HTTPException(status_code=404, detail="Note not found")
+
+    return result
+
+@router.delete("/{book_id}/notes/{note_id}", status_code=204)
+def delete_note(book_id: int, note_id: int, user_id: UUID = Depends(get_current_user_id)):
+    """
+    Delete a note for a specific book in the current user's library.
+    """
+    success = books.delete_note(user_id, book_id, note_id)
+
+    if not success:
+        raise HTTPException(status_code=404, detail="Note not found")
+
+    return None
