@@ -105,6 +105,7 @@ def update_reading_progress(
 
     return result
 
+
 @router.get("/{book_id}/notes", response_model=list[NoteResponse])
 def get_notes(book_id: int, user_id: UUID = Depends(get_current_user_id)):
     """
@@ -117,32 +118,44 @@ def get_notes(book_id: int, user_id: UUID = Depends(get_current_user_id)):
 
     return result
 
+
 @router.post("/{book_id}/notes", response_model=NoteResponse)
-def add_note(book_id: int, note_data: NoteCreate, user_id: UUID = Depends(get_current_user_id)):
+def add_note(
+    book_id: int, note_data: NoteCreate, user_id: UUID = Depends(get_current_user_id)
+):
     """
     Add a note to a specific book in the current user's library.
     """
     result = books.add_note(user_id, book_id, note_data)
-    
+
     if result is None:
         raise HTTPException(status_code=404, detail="Book not found")
 
     return result
 
+
 @router.patch("/{book_id}/notes/{note_id}", response_model=NoteResponse)
-def update_note(book_id: int, note_id: int, note_data: NoteCreate, user_id: UUID = Depends(get_current_user_id)):
+def update_note(
+    book_id: int,
+    note_id: int,
+    note_data: NoteCreate,
+    user_id: UUID = Depends(get_current_user_id),
+):
     """
     Update a note for a specific book in the current user's library.
     """
     result = books.update_note(user_id, book_id, note_id, note_data)
-    
+
     if result is None:
         raise HTTPException(status_code=404, detail="Note not found")
 
     return result
 
+
 @router.delete("/{book_id}/notes/{note_id}", status_code=204)
-def delete_note(book_id: int, note_id: int, user_id: UUID = Depends(get_current_user_id)):
+def delete_note(
+    book_id: int, note_id: int, user_id: UUID = Depends(get_current_user_id)
+):
     """
     Delete a note for a specific book in the current user's library.
     """

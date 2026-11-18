@@ -7,7 +7,9 @@ from app.projects.water.api.water import router as water_router
 
 app = FastAPI(
     title="Elie's Project APIs",
-    swagger_ui_parameters={"persistAuthorization": True if config.env == "dev" else False},
+    swagger_ui_parameters={
+        "persistAuthorization": True if config.env == "dev" else False
+    },
 )
 
 app.add_middleware(

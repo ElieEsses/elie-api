@@ -146,26 +146,22 @@ def update_progress(user_id: UUID, book_id: int, update: ReadingProgressUpdate):
 
         return get_by_id(user_id, book_id)
 
+
 def get_notes(user_id: UUID, book_id: int):
     with get_session() as session:
-        query = (
-            select(Note)
-            .where(Note.user_id == user_id, Note.book_id == book_id)
-        )
+        query = select(Note).where(Note.user_id == user_id, Note.book_id == book_id)
         return session.scalars(query).all()
+
 
 def add_note(user_id: UUID, book_id: int, note_data: NoteCreate):
     with get_session() as session:
-        note = Note(
-            user_id=user_id,
-            book_id=book_id,
-            content=note_data.content
-        )
+        note = Note(user_id=user_id, book_id=book_id, content=note_data.content)
         session.add(note)
         session.commit()
         session.refresh(note)
 
     return note
+
 
 def delete_note(user_id: UUID, book_id: int, note_id: int):
     with get_session() as session:
@@ -178,6 +174,7 @@ def delete_note(user_id: UUID, book_id: int, note_id: int):
         session.commit()
 
     return True
+
 
 def update_note(user_id: UUID, book_id: int, note_id: int, note_data: NoteCreate):
     with get_session() as session:
