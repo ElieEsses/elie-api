@@ -30,7 +30,7 @@ def get_by_id(user_id: UUID, book_id: int):
         )
 
         result = session.execute(query).first()
-
+        
         if result is None:
             return None
 
@@ -71,6 +71,37 @@ def add(user_id: UUID, book_data: BookData):
         session.commit()
 
     return get_by_id(user_id, book_id)
+
+def delete(user_id: UUID, book_id: int):
+    with get_session() as session:
+        entry = session.get(Library, (user_id, book_id))
+
+        if entry is None:
+            return None
+
+        session.delete(entry)
+        session.commit()
+
+    return True
+
+def update_details(user_id: UUID, book_id: int, book_data: BookData):
+    with get_session() as session:
+        book = session.get(Book, book_id)
+
+        if book is None:
+            return None
+
+        changes = book_data.model_dump(exclude_unset=True)
+
+        for key, value in changes.items():
+            setattr(book, key, value)
+
+        session.commit()
+
+    print(user_id, book_id)
+    result = get_by_id(user_id, book_id)
+    print(result)
+    return result
 
 def update_progress(user_id: UUID, book_id: int, update: ReadingProgressUpdate):
     with get_session() as session:

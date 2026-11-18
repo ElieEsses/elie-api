@@ -8,7 +8,6 @@ from app.models.models import (
     BookDetailResponse,
     BookResponse,
     ReadingProgressUpdate,
-    LibraryEntryResponse
 )
 from app.services.auth import get_current_user_id
 from app.services.book_lookup import get_book_data
@@ -51,8 +50,36 @@ def add_book(book_data: BookData, user_id: UUID = Depends(get_current_user_id)):
         return books.add(user_id, book_data)
     except ValueError as e:
         raise HTTPException(status_code=409, detail=str(e)) from e
-    
+
 @router.patch("/{book_id}", response_model=BookDetailResponse)
+def update_book_details(
+    book_id: int,
+    book_data: BookData,
+    user_id: UUID = Depends(get_current_user_id),
+):
+    """
+    Update the details of a specific book in the current user's library.
+    """
+    result = books.update_details(user_id, book_id, book_data)
+
+    if result is None:
+        raise HTTPException(status_code=404, detail="Book not found")
+
+    return result
+
+@router.delete("/{book_id}", status_code=204)
+def delete_book(book_id: int, user_id: UUID = Depends(get_current_user_id)):
+    """
+    Delete a specific book from the current user's library.
+    """
+    success = books.delete(user_id, book_id)
+
+    if not success:
+        raise HTTPException(status_code=404, detail="Book not found")
+
+    return None
+
+@router.patch("/{book_id}/progress", response_model=BookDetailResponse)
 def update_reading_progress(
     book_id: int,
     update: ReadingProgressUpdate,
@@ -64,4 +91,3 @@ def update_reading_progress(
         raise HTTPException(status_code=404, detail="Book not found")
 
     return result
-

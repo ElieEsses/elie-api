@@ -1,6 +1,14 @@
+from datetime import datetime
 from uuid import UUID
 
-from sqlalchemy import BigInteger, ForeignKey, Text
+from sqlalchemy import (
+    BigInteger,
+    DateTime,
+    ForeignKey,
+    ForeignKeyConstraint,
+    Text,
+    func,
+)
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
@@ -33,3 +41,24 @@ class Library(Base):
     status: Mapped[str] = mapped_column(nullable=False, default="unread")
     pages_read: Mapped[int] = mapped_column(nullable=False, default=0)
     nfc_url: Mapped[str] = mapped_column(nullable=False, default="https://library.app.elie-esses.com/library")
+
+class Note(Base):
+    __tablename__ = "notes"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[UUID] = mapped_column(nullable=False)
+    book_id: Mapped[int] = mapped_column(nullable=False)
+    content: Mapped[str] = mapped_column(Text, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        nullable=False,
+    )
+
+    __table_args__ = (
+        ForeignKeyConstraint(
+            ["user_id", "book_id"],
+            ["libraries.user_id", "libraries.book_id"],
+            ondelete="CASCADE",
+        ),
+    )
