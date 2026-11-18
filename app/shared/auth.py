@@ -10,11 +10,10 @@ from app.config import config
 DB_URL = config.db_url.rstrip("/")
 ISSUER = f"{DB_URL}/auth/v1"
 
-jwks_client = PyJWKClient(
-    f"{ISSUER}/.well-known/jwks.json"
-)
+jwks_client = PyJWKClient(f"{ISSUER}/.well-known/jwks.json")
 
 bearer_scheme = HTTPBearer()
+
 
 # helper func that verifies the token and returns the payload
 def verify_token(token: str) -> dict:
@@ -28,6 +27,7 @@ def verify_token(token: str) -> dict:
         issuer=ISSUER,
         options={"require": ["exp", "iss", "aud", "sub"]},
     )
+
 
 # get user id from the token and return it as a UUID, for use in the endpoints
 def get_current_user_id(

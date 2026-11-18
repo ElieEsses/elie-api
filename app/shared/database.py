@@ -7,6 +7,7 @@ from app.config import config
 
 engine = create_engine(config.db_connection_string)
 
+
 @contextmanager
 def get_session():
     with Session(engine) as session:

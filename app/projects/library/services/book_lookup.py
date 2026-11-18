@@ -7,7 +7,7 @@ from app.projects.library.models.models import BookData
 def get_book_data(isbn: str) -> BookData | None:
     # remove - from isbn and strip whitespace
     isbn = isbn.replace("-", "").strip()
-    
+
     # get title, authors, page count from google books api
     response = requests.get(
         config.google_books_url,
@@ -18,7 +18,7 @@ def get_book_data(isbn: str) -> BookData | None:
     items = response.json().get("items", [])
     if not items:
         return None
-    
+
     data = items[0].get("volumeInfo", {})
 
     title = data.get("title")
@@ -32,7 +32,7 @@ def get_book_data(isbn: str) -> BookData | None:
         params={"isbn": isbn, "fields": "first_publish_year", "limit": 1},
         timeout=10,
     )
-    
+
     metadata_res.raise_for_status()
     docs = metadata_res.json().get("docs", [])
     if docs:

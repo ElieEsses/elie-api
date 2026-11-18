@@ -21,6 +21,7 @@ def get_all(user_id: UUID):
         )
         return session.scalars(query).all()
 
+
 def get_by_id(user_id: UUID, book_id: int):
     with get_session() as session:
         query = (
@@ -30,7 +31,7 @@ def get_by_id(user_id: UUID, book_id: int):
         )
 
         result = session.execute(query).first()
-        
+
         if result is None:
             return None
 
@@ -42,7 +43,8 @@ def get_by_id(user_id: UUID, book_id: int):
             pages_read=library_entry.pages_read,
             nfc_url=library_entry.nfc_url,
         )
-    
+
+
 def add(user_id: UUID, book_data: BookData):
     with get_session() as session:
         # check if the book already exists in the database
@@ -51,9 +53,11 @@ def add(user_id: UUID, book_data: BookData):
 
         # if the book does not exist in the database, create a new entry for it
         if book is None:
-            book = Book(**book_data.model_dump()) # converts Pydantic model to dict with right fields for SQLAlchemy model
+            book = Book(
+                **book_data.model_dump()
+            )  # converts Pydantic model to dict with right fields for SQLAlchemy model
             session.add(book)
-            session.flush() # we use flush to get back book.id without committing the transaction yet
+            session.flush()  # we use flush to get back book.id without committing the transaction yet
 
         # if the book already exists in the database, check if it is already in the user's library
         else:
@@ -65,12 +69,13 @@ def add(user_id: UUID, book_data: BookData):
         # if the book is not in the user's library, add it
         nfc_url = f"https://library.app.elie-esses.com/library/{book.id}"
         library_entry = Library(user_id=user_id, book_id=book.id, nfc_url=nfc_url)
-        
+
         session.add(library_entry)
         book_id = book.id
         session.commit()
 
     return get_by_id(user_id, book_id)
+
 
 def delete(user_id: UUID, book_id: int):
     with get_session() as session:
@@ -83,6 +88,7 @@ def delete(user_id: UUID, book_id: int):
         session.commit()
 
     return True
+
 
 def update_details(user_id: UUID, book_id: int, book_data: BookData):
     with get_session() as session:
@@ -103,6 +109,7 @@ def update_details(user_id: UUID, book_id: int, book_data: BookData):
     print(result)
     return result
 
+
 def update_progress(user_id: UUID, book_id: int, update: ReadingProgressUpdate):
     with get_session() as session:
         entry = session.get(Library, (user_id, book_id))
@@ -114,12 +121,12 @@ def update_progress(user_id: UUID, book_id: int, update: ReadingProgressUpdate):
 
         book = session.get(Book, book_id)
 
-        # updates pages_read 
+        # updates pages_read
         if "pages_read" in changes:
             entry.pages_read = changes["pages_read"]
-            
+
             if book is not None and book.num_pages is not None:
-                if entry.pages_read >=book.num_pages:
+                if entry.pages_read >= book.num_pages:
                     entry.status = "finished"
                 elif entry.pages_read <= 0:
                     entry.status = "unread"

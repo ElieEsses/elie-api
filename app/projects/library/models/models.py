@@ -11,6 +11,7 @@ class BookData(BaseModel):
     num_pages: int | None = None
     cover_url: str | None = None
 
+
 class BookResponse(BaseModel):
     id: int
     isbn: str
@@ -22,17 +23,21 @@ class BookResponse(BaseModel):
 
     model_config = ConfigDict(from_attributes=True)
 
+
 class BookDetailResponse(BookResponse):
     status: str
     pages_read: int
     nfc_url: str | None = None
 
+
 class ReadingProgressUpdate(BaseModel):
     status: Literal["unread", "reading", "finished"] | None = None
     pages_read: int | None = Field(default=None, ge=0)
 
+
 class NoteData(BaseModel):
     content: str
+
 
 class NoteResponse(NoteData):
     id: int

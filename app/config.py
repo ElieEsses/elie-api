@@ -2,8 +2,10 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
+    env: str = "dev"
+
     frontend_url: str
-    
+
     google_api_key: str
     google_books_url: str = "https://www.googleapis.com/books/v1/volumes"
 
@@ -22,4 +24,4 @@ class Settings(BaseSettings):
     )
 
 
-config = Settings() # pyright: ignore[reportCallIssue]
+config = Settings()  # pyright: ignore[reportCallIssue]

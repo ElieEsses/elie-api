@@ -9,7 +9,12 @@ router = APIRouter(prefix="/water", tags=["Water"])
 
 router = APIRouter(prefix="/water", tags=["Water"])
 
-@router.get("/quota", response_model=TextQuotaResponse, dependencies=[Depends(get_current_user_id)])
+
+@router.get(
+    "/quota",
+    response_model=TextQuotaResponse,
+    dependencies=[Depends(get_current_user_id)],
+)
 def get_textbelt_quota():
     response = requests.get(
         f"https://textbelt.com/quota/{config.textbelt_api_key}",

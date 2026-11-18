@@ -14,12 +14,14 @@ from app.shared.auth import get_current_user_id
 
 router = APIRouter(prefix="/books", tags=["Digital Library"])
 
+
 @router.get("", response_model=list[BookResponse])
 def get_books(user_id: UUID = Depends(get_current_user_id)):
     """
     Get all books for the current user.
     """
     return books.get_all(user_id)
+
 
 @router.get("/{book_id}", response_model=BookDetailResponse)
 def get_book(book_id: int, user_id: UUID = Depends(get_current_user_id)):
@@ -31,15 +33,18 @@ def get_book(book_id: int, user_id: UUID = Depends(get_current_user_id)):
         raise HTTPException(status_code=404, detail="Book not found")
     return book
 
-@router.get("/lookup/{isbn}", 
-            response_model=BookData | None, 
-            dependencies=[Depends(get_current_user_id)]
-            )
+
+@router.get(
+    "/lookup/{isbn}",
+    response_model=BookData | None,
+    dependencies=[Depends(get_current_user_id)],
+)
 def book_lookup(isbn: str) -> BookData | None:
     """
     Look up a book by its ISBN using the Google Books API and Open Library API.
     """
     return get_book_data(isbn)
+
 
 @router.post("", response_model=BookDetailResponse)
 def add_book(book_data: BookData, user_id: UUID = Depends(get_current_user_id)):
@@ -50,6 +55,7 @@ def add_book(book_data: BookData, user_id: UUID = Depends(get_current_user_id)):
         return books.add(user_id, book_data)
     except ValueError as e:
         raise HTTPException(status_code=409, detail=str(e)) from e
+
 
 @router.patch("/{book_id}", response_model=BookDetailResponse)
 def update_book_details(
@@ -67,6 +73,7 @@ def update_book_details(
 
     return result
 
+
 @router.delete("/{book_id}", status_code=204)
 def delete_book(book_id: int, user_id: UUID = Depends(get_current_user_id)):
     """
@@ -78,6 +85,7 @@ def delete_book(book_id: int, user_id: UUID = Depends(get_current_user_id)):
         raise HTTPException(status_code=404, detail="Book not found")
 
     return None
+
 
 @router.patch("/{book_id}/progress", response_model=BookDetailResponse)
 def update_reading_progress(

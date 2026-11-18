@@ -16,6 +16,7 @@ from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 class Base(DeclarativeBase):
     pass
 
+
 class Book(Base):
     __tablename__ = "books"
 
@@ -30,6 +31,7 @@ class Book(Base):
     num_pages: Mapped[int | None] = mapped_column(nullable=True)
     cover_url: Mapped[str | None] = mapped_column(nullable=True)
 
+
 class Library(Base):
     __tablename__ = "libraries"
 
@@ -37,10 +39,15 @@ class Library(Base):
         return f"Library(user_id={self.user_id}, book_id={self.book_id})"
 
     user_id: Mapped[UUID] = mapped_column(primary_key=True)
-    book_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("books.id"), primary_key=True)
+    book_id: Mapped[int] = mapped_column(
+        BigInteger, ForeignKey("books.id"), primary_key=True
+    )
     status: Mapped[str] = mapped_column(nullable=False, default="unread")
     pages_read: Mapped[int] = mapped_column(nullable=False, default=0)
-    nfc_url: Mapped[str] = mapped_column(nullable=False, default="https://library.app.elie-esses.com/library")
+    nfc_url: Mapped[str] = mapped_column(
+        nullable=False, default="https://library.app.elie-esses.com/library"
+    )
+
 
 class Note(Base):
     __tablename__ = "notes"
