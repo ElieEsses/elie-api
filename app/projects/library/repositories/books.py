@@ -192,6 +192,8 @@ def update_note(
     with get_session() as session:
         note = session.get(Note, note_id)
 
+        print(note)
+
         if note is None or note.user_id != user_id or note.book_id != book_id:
             return None
 

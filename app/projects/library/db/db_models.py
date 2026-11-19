@@ -52,6 +52,9 @@ class Library(Base):
 class Note(Base):
     __tablename__ = "notes"
 
+    def __repr__(self) -> str:
+        return f"Note(id={self.id}, user_id={self.user_id}, book_id={self.book_id})"
+
     id: Mapped[int] = mapped_column(primary_key=True)
     user_id: Mapped[UUID] = mapped_column(nullable=False)
     book_id: Mapped[int] = mapped_column(nullable=False)
