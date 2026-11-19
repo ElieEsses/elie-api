@@ -45,7 +45,15 @@ def book_lookup(isbn: str):
     """
     Look up a book by its ISBN using the Google Books API and Open Library API.
     """
-    return get_book_data(isbn)
+    try:
+        book = get_book_data(isbn)
+    except RuntimeError as e:
+        raise HTTPException(status_code=503, detail="Book lookup failed.") from e
+
+    if not book:
+        raise HTTPException(status_code=404, detail="Book not found")
+
+    return book
 
 
 @router.post("", response_model=BookDetailResponse)
