@@ -1,4 +1,4 @@
-import requests
+from requests import request, RequestException
 
 from app.config import config
 from app.projects.library.models.models import BookData
