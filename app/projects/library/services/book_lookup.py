@@ -42,7 +42,7 @@ def get_book_data(isbn: str) -> BookData | None:
     # cover image url open library api
     cover_url = f"{config.open_library_cover_url}/b/isbn/{isbn}-L.jpg?default=false"
 
-    book_data = BookData(
+    return BookData(
         isbn=isbn,
         title=title,
         authors=authors,
@@ -50,5 +50,3 @@ def get_book_data(isbn: str) -> BookData | None:
         num_pages=page_count,
         cover_url=cover_url,
     )
-
-    return book_data

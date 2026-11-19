@@ -41,7 +41,7 @@ def get_book(book_id: int, user_id: UUID = Depends(get_current_user_id)):
     response_model=BookData | None,
     dependencies=[Depends(get_current_user_id)],
 )
-def book_lookup(isbn: str) -> BookData | None:
+def book_lookup(isbn: str):
     """
     Look up a book by its ISBN using the Google Books API and Open Library API.
     """
