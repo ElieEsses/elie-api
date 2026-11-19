@@ -29,4 +29,4 @@ def get_textbelt_quota():
     if not data["success"]:
         raise RuntimeError("Failed to retrieve quota")
 
-    return {"texts_remaining": data["quotaRemaining"]}
+    return TextQuotaResponse(texts_remaining=data["quotaRemaining"])

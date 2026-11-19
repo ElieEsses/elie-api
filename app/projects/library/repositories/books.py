@@ -8,22 +8,26 @@ from app.projects.library.models.models import (
     BookDetailResponse,
     BookResponse,
     NoteCreate,
+    NoteResponse,
     ReadingProgressUpdate,
 )
 from app.shared.database import get_session
 
 
-def get_all(user_id: UUID):
+def get_all(user_id: UUID) -> list[BookResponse]:
     with get_session() as session:
         query = (
             select(Book)
             .join(Library, Book.id == Library.book_id)
             .where(Library.user_id == user_id)
         )
-        return session.scalars(query).all()
+
+        books = session.scalars(query).all()
+
+        return [BookResponse.model_validate(book) for book in books]
 
 
-def get_by_id(user_id: UUID, book_id: int):
+def get_by_id(user_id: UUID, book_id: int) -> BookDetailResponse | None:
     with get_session() as session:
         query = (
             select(Book, Library)
@@ -46,7 +50,7 @@ def get_by_id(user_id: UUID, book_id: int):
         )
 
 
-def add(user_id: UUID, book_data: BookData):
+def add(user_id: UUID, book_data: BookData) -> BookDetailResponse | None:
     with get_session() as session:
         # check if the book already exists in the database
         existence_check_query = select(Book).where(Book.isbn == book_data.isbn)
@@ -78,7 +82,7 @@ def add(user_id: UUID, book_data: BookData):
     return get_by_id(user_id, book_id)
 
 
-def delete(user_id: UUID, book_id: int):
+def delete(user_id: UUID, book_id: int) -> bool | None:
     with get_session() as session:
         entry = session.get(Library, (user_id, book_id))
 
@@ -91,7 +95,9 @@ def delete(user_id: UUID, book_id: int):
     return True
 
 
-def update_details(user_id: UUID, book_id: int, book_data: BookData):
+def update_details(
+    user_id: UUID, book_id: int, book_data: BookData
+) -> BookDetailResponse | None:
     with get_session() as session:
         book = session.get(Book, book_id)
 
@@ -105,11 +111,12 @@ def update_details(user_id: UUID, book_id: int, book_data: BookData):
 
         session.commit()
 
-    result = get_by_id(user_id, book_id)
-    return result
+    return get_by_id(user_id, book_id)
 
 
-def update_progress(user_id: UUID, book_id: int, update: ReadingProgressUpdate):
+def update_progress(
+    user_id: UUID, book_id: int, update: ReadingProgressUpdate
+) -> BookDetailResponse | None:
     with get_session() as session:
         entry = session.get(Library, (user_id, book_id))
 
@@ -147,23 +154,26 @@ def update_progress(user_id: UUID, book_id: int, update: ReadingProgressUpdate):
         return get_by_id(user_id, book_id)
 
 
-def get_notes(user_id: UUID, book_id: int):
+def get_notes(user_id: UUID, book_id: int) -> list[NoteResponse]:
     with get_session() as session:
         query = select(Note).where(Note.user_id == user_id, Note.book_id == book_id)
-        return session.scalars(query).all()
+
+        notes = session.scalars(query).all()
+
+        return [NoteResponse.model_validate(note) for note in notes]
 
 
-def add_note(user_id: UUID, book_id: int, note_data: NoteCreate):
+def add_note(user_id: UUID, book_id: int, note_data: NoteCreate) -> NoteResponse:
     with get_session() as session:
         note = Note(user_id=user_id, book_id=book_id, content=note_data.content)
         session.add(note)
         session.commit()
         session.refresh(note)
 
-    return note
+        return NoteResponse.model_validate(note)
 
 
-def delete_note(user_id: UUID, book_id: int, note_id: int):
+def delete_note(user_id: UUID, book_id: int, note_id: int) -> bool | None:
     with get_session() as session:
         note = session.get(Note, note_id)
 
@@ -176,7 +186,9 @@ def delete_note(user_id: UUID, book_id: int, note_id: int):
     return True
 
 
-def update_note(user_id: UUID, book_id: int, note_id: int, note_data: NoteCreate):
+def update_note(
+    user_id: UUID, book_id: int, note_id: int, note_data: NoteCreate
+) -> NoteResponse | None:
     with get_session() as session:
         note = session.get(Note, note_id)
 
@@ -187,4 +199,4 @@ def update_note(user_id: UUID, book_id: int, note_id: int, note_data: NoteCreate
         session.commit()
         session.refresh(note)
 
-    return note
+    return NoteResponse.model_validate(note)
