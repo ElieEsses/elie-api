@@ -5,7 +5,6 @@ from fastapi import APIRouter, Depends, HTTPException
 import app.projects.library.repositories.books as books
 from app.projects.library.models.models import (
     BookData,
-    BookDetailResponse,
     BookResponse,
     NoteCreate,
     NoteResponse,
@@ -25,7 +24,7 @@ def get_books(user_id: UUID = Depends(get_current_user_id)):
     return books.get_all(user_id)
 
 
-@router.get("/{book_id}", response_model=BookDetailResponse)
+@router.get("/{book_id}", response_model=BookResponse)
 def get_book(book_id: int, user_id: UUID = Depends(get_current_user_id)):
     """
     Get a specific book by its ID for the current user.
@@ -56,7 +55,7 @@ def book_lookup(isbn: str):
     return book
 
 
-@router.post("", response_model=BookDetailResponse)
+@router.post("", response_model=BookResponse)
 def add_book(book_data: BookData, user_id: UUID = Depends(get_current_user_id)):
     """
     Add a book to the current user's library.
@@ -67,7 +66,7 @@ def add_book(book_data: BookData, user_id: UUID = Depends(get_current_user_id)):
         raise HTTPException(status_code=409, detail=str(e)) from e
 
 
-@router.patch("/{book_id}", response_model=BookDetailResponse)
+@router.patch("/{book_id}", response_model=BookResponse)
 def update_book_details(
     book_id: int,
     book_data: BookData,
@@ -97,7 +96,7 @@ def delete_book(book_id: int, user_id: UUID = Depends(get_current_user_id)):
     return None
 
 
-@router.patch("/{book_id}/progress", response_model=BookDetailResponse)
+@router.patch("/{book_id}/progress", response_model=BookResponse)
 def update_reading_progress(
     book_id: int,
     update: ReadingProgressUpdate,

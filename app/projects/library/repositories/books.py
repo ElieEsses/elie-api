@@ -5,7 +5,6 @@ from sqlalchemy import select
 from app.projects.library.db.db_models import Book, Library, Note
 from app.projects.library.models.models import (
     BookData,
-    BookDetailResponse,
     BookResponse,
     NoteCreate,
     NoteResponse,
@@ -17,17 +16,37 @@ from app.shared.database import get_session
 def get_all(user_id: UUID) -> list[BookResponse]:
     with get_session() as session:
         query = (
-            select(Book)
+            select(Book, Library)
             .join(Library, Book.id == Library.book_id)
             .where(Library.user_id == user_id)
         )
 
-        books = session.scalars(query).all()
+        books = session.execute(query).all()
 
-        return [BookResponse.model_validate(book) for book in books]
+        books_list = [
+            BookResponse.model_validate(
+                {
+                    **book.__dict__,
+                    "status": library_entry.status,
+                    "pages_read": library_entry.pages_read,
+                    "nfc_url": library_entry.nfc_url,
+                }
+            )
+            for book, library_entry in books
+        ]
+
+        # sort the books by status and then by title
+        status_order = {
+            "reading": 0,
+            "unread": 1,
+            "finished": 2,
+        }
+        books_list.sort(key=lambda x: (status_order.get(x.status, 3), x.title.lower()))
+
+        return books_list
 
 
-def get_by_id(user_id: UUID, book_id: int) -> BookDetailResponse | None:
+def get_by_id(user_id: UUID, book_id: int) -> BookResponse | None:
     with get_session() as session:
         query = (
             select(Book, Library)
@@ -42,15 +61,17 @@ def get_by_id(user_id: UUID, book_id: int) -> BookDetailResponse | None:
 
         book, library_entry = result
 
-        return BookDetailResponse(
-            **BookResponse.model_validate(book).model_dump(),
-            status=library_entry.status,
-            pages_read=library_entry.pages_read,
-            nfc_url=library_entry.nfc_url,
+        return BookResponse.model_validate(
+            {
+                **book.__dict__,
+                "status": library_entry.status,
+                "pages_read": library_entry.pages_read,
+                "nfc_url": library_entry.nfc_url,
+            }
         )
 
 
-def add(user_id: UUID, book_data: BookData) -> BookDetailResponse | None:
+def add(user_id: UUID, book_data: BookData) -> BookResponse | None:
     with get_session() as session:
         # check if the book already exists in the database
         existence_check_query = select(Book).where(Book.isbn == book_data.isbn)
@@ -97,7 +118,7 @@ def delete(user_id: UUID, book_id: int) -> bool | None:
 
 def update_details(
     user_id: UUID, book_id: int, book_data: BookData
-) -> BookDetailResponse | None:
+) -> BookResponse | None:
     with get_session() as session:
         book = session.get(Book, book_id)
 
@@ -116,7 +137,7 @@ def update_details(
 
 def update_progress(
     user_id: UUID, book_id: int, update: ReadingProgressUpdate
-) -> BookDetailResponse | None:
+) -> BookResponse | None:
     with get_session() as session:
         entry = session.get(Library, (user_id, book_id))
 
