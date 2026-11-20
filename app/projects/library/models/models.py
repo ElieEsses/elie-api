@@ -21,14 +21,11 @@ class BookResponse(BaseModel):
     first_publish_year: int | None
     num_pages: int | None
     cover_url: str | None
-
-    model_config = ConfigDict(from_attributes=True)
-
-
-class BookDetailResponse(BookResponse):
     status: str
     pages_read: int
     nfc_url: str | None = None
+
+    model_config = ConfigDict(from_attributes=True)
 
 
 class ReadingProgressUpdate(BaseModel):
