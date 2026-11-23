@@ -1,3 +1,5 @@
+import logging
+
 from fastapi import APIRouter, Depends, HTTPException
 
 from app.config import config
@@ -8,6 +10,8 @@ from app.projects.water.services.water_text_utils import (
     send_water_reminder,
 )
 from app.shared.auth import get_current_user_id, verify_internal_api_key
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/water", tags=["Water Reminders"])
 
@@ -34,11 +38,15 @@ def get_quota():
     response_model=TextResponse,
     dependencies=[Depends(get_current_user_id)],
 )
-def send_message_endpoint():
-    """
-    Sends a water reminder message using Textbelt API.
-    """
-    return send_message()
+def execute_send_message():
+    try:
+        return send_message()
+    except Exception:
+        logger.exception("Failed to send message")
+        raise HTTPException(
+            status_code=500,
+            detail="Failed to send message",
+        ) from None
 
 
 @router.post(
@@ -50,7 +58,7 @@ def internal_send_message():
     """
     Internal endpoint (with internal API verification) to send water reminder message using Textbelt API.
     """
-    return send_message()
+    return execute_send_message()
 
 
 @router.post(
@@ -75,7 +83,7 @@ def send_custom_message(message_body: str):
 
     return TextResponse(
         message_sent=message_body,
-        recipient="Elie" if config.env == "dev" else "Helaina",
+        recipient="Elie" if config.texting_service_mode == "dev" else "Helaina",
         recipient_number=to_number,
         remaining_quota=quota_remaining,
     )
