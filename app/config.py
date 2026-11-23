@@ -1,8 +1,10 @@
+from typing import Literal
+
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    env: str = "dev"
+    env: Literal["dev", "prod"] = "dev"
 
     internal_api_key: str
 
@@ -21,6 +23,7 @@ class Settings(BaseSettings):
     textbelt_api_key: str
     elie_number: str
     helaina_number: str
+    texting_service_mode: Literal["dev", "prod"] = "dev"
 
     model_config = SettingsConfigDict(
         env_file=".env",
