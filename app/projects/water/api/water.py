@@ -28,6 +28,7 @@ def get_quota():
     try:
         quota_remaining = get_textbelt_quota()
     except Exception:
+        logger.exception("Failed to retrieve quota")
         raise HTTPException(status_code=500, detail="Failed to retrieve quota")
 
     return TextQuotaResponse(textbelt_quota_remaining=quota_remaining)
@@ -79,6 +80,7 @@ def send_custom_message(message_body: str):
     try:
         quota_remaining = send_water_reminder(to_number, message_body)
     except Exception:
+        logger.exception("Failed to send message")
         raise HTTPException(status_code=500, detail="Failed to send message")
 
     return TextResponse(

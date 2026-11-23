@@ -1,3 +1,4 @@
+import logging
 from uuid import UUID
 
 from sqlalchemy import select
@@ -11,6 +12,8 @@ from app.projects.library.models.models import (
     ReadingProgressUpdate,
 )
 from app.shared.database import get_session
+
+logger = logging.getLogger(__name__)
 
 
 def get_all(user_id: UUID) -> list[BookResponse]:
@@ -100,6 +103,8 @@ def add(user_id: UUID, book_data: BookData) -> BookResponse | None:
         book_id = book.id
         session.commit()
 
+        logger.info("Book added to library: %s (ID: %s)", book.title, book.id)
+
     return get_by_id(user_id, book_id)
 
 
@@ -112,6 +117,8 @@ def delete(user_id: UUID, book_id: int) -> bool | None:
 
         session.delete(entry)
         session.commit()
+
+        logger.info("Book removed from library: ID %s", book_id)
 
     return True
 
@@ -131,6 +138,12 @@ def update_details(
             setattr(book, key, value)
 
         session.commit()
+
+        logger.info(
+            "Book details updated: ID %s, changes: %s",
+            book_id,
+            changes,
+        )
 
     return get_by_id(user_id, book_id)
 
@@ -172,6 +185,13 @@ def update_progress(
 
         session.commit()
 
+        logger.info(
+            "Reading progress updated: book_id=%s, pages=%s, status=%s",
+            book_id,
+            entry.pages_read,
+            entry.status,
+        )
+
         return get_by_id(user_id, book_id)
 
 
@@ -191,6 +211,13 @@ def add_note(user_id: UUID, book_id: int, note_data: NoteCreate) -> NoteResponse
         session.commit()
         session.refresh(note)
 
+        logger.info(
+            "Note added: user_id=%s, book_id=%s, note_id=%s",
+            user_id,
+            book_id,
+            note.id,
+        )
+
         return NoteResponse.model_validate(note)
 
 
@@ -203,6 +230,13 @@ def delete_note(user_id: UUID, book_id: int, note_id: int) -> bool | None:
 
         session.delete(note)
         session.commit()
+
+        logger.info(
+            "Note deleted: user_id=%s, book_id=%s, note_id=%s",
+            user_id,
+            book_id,
+            note_id,
+        )
 
     return True
 
@@ -221,5 +255,12 @@ def update_note(
         note.content = note_data.content
         session.commit()
         session.refresh(note)
+
+        logger.info(
+            "Note updated: user_id=%s, book_id=%s, note_id=%s",
+            user_id,
+            book_id,
+            note.id,
+        )
 
     return NoteResponse.model_validate(note)
