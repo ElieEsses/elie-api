@@ -46,7 +46,6 @@ def generate_message():
 
 
 def send_water_reminder(to_number: str, message_body: str) -> int:
-    print(f"Sending message to {to_number}: {message_body}")
     resp = requests.post(
         "https://textbelt.com/text",
         data={
@@ -59,8 +58,6 @@ def send_water_reminder(to_number: str, message_body: str) -> int:
     resp.raise_for_status()
     result = resp.json()
 
-    print(f"Textbelt response: {result}")
-
     if not result.get("success"):
         raise RuntimeError(result.get("error", "SMS request failed"))
 
@@ -70,7 +67,13 @@ def send_water_reminder(to_number: str, message_body: str) -> int:
 
 
 def send_message() -> TextResponse:
-    to_number = config.elie_number if config.env == "dev" else config.helaina_number
+    to_number = (
+        config.elie_number
+        if config.texting_service_mode == "dev"
+        else config.helaina_number
+    )
+    recipient_name = "Elie" if config.texting_service_mode == "dev" else "Helaina"
+
     message_body = generate_message()
 
     try:
@@ -80,7 +83,7 @@ def send_message() -> TextResponse:
 
     return TextResponse(
         message_sent=message_body,
-        recipient="Elie" if config.env == "dev" else "Helaina",
+        recipient=recipient_name,
         recipient_number=to_number,
         remaining_quota=quota_remaining,
     )

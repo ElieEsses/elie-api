@@ -62,7 +62,11 @@ def send_custom_message(message_body: str):
     """
     Sends a custom water message using Textbelt API.
     """
-    to_number = config.elie_number if config.env == "dev" else config.helaina_number
+    to_number = (
+        config.elie_number
+        if config.texting_service_mode == "dev"
+        else config.helaina_number
+    )
 
     try:
         quota_remaining = send_water_reminder(to_number, message_body)
