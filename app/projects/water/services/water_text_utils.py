@@ -28,7 +28,6 @@ def get_textbelt_quota() -> int:
         raise RuntimeError("Failed to retrieve quota")
 
     quota_remaining = data.get("quotaRemaining")
-    logger.info(f"Textbelt quota remaining: {quota_remaining}")
     return quota_remaining
 
 
