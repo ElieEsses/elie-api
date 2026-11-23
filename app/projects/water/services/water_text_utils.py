@@ -59,6 +59,8 @@ def send_water_reminder(to_number: str, message_body: str) -> int:
     resp.raise_for_status()
     result = resp.json()
 
+    print(f"Textbelt response: {result}")
+
     if not result.get("success"):
         raise RuntimeError(result.get("error", "SMS request failed"))
 
