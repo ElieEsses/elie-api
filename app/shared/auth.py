@@ -1,8 +1,9 @@
+import secrets
 from uuid import UUID
 
 import jwt
 from fastapi import Depends, HTTPException
-from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from fastapi.security import APIKeyHeader, HTTPAuthorizationCredentials, HTTPBearer
 from jwt import PyJWKClient
 
 from app.config import config
@@ -40,4 +41,21 @@ def get_current_user_id(
         raise HTTPException(
             status_code=401,
             detail="Invalid or expired token",
+        )
+
+
+internal_key_scheme = APIKeyHeader(
+    name="X-Internal-API-Key",
+    scheme_name="InternalAPIKey",
+    auto_error=False,
+)
+
+
+def verify_internal_api_key(
+    key: str | None = Depends(internal_key_scheme),
+):
+    if key is None or not secrets.compare_digest(key, config.internal_api_key):
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid internal API key",
         )

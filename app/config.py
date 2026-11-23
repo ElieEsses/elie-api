@@ -4,6 +4,8 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     env: str = "dev"
 
+    internal_api_key: str
+
     frontend_url: str
 
     google_api_key: str
@@ -17,6 +19,8 @@ class Settings(BaseSettings):
     db_publishable_key: str
 
     textbelt_api_key: str
+    elie_number: str
+    helaina_number: str
 
     model_config = SettingsConfigDict(
         env_file=".env",
