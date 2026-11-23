@@ -4,6 +4,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.config import config
 from app.projects.library.api.books import router as books_router
 from app.projects.water.api.water import router as water_router
+from app.shared.logging import setup_logging
+
+setup_logging()
 
 app = FastAPI(
     title="Elie's Project APIs",

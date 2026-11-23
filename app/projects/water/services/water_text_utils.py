@@ -1,7 +1,7 @@
+import logging
 from random import choice
 
 import requests
-from fastapi import HTTPException
 
 from app.config import config
 from app.projects.water.models.models import TextResponse
@@ -11,6 +11,8 @@ from app.projects.water.services.message_lists import (
     messages,
     water_emojis,
 )
+
+logger = logging.getLogger(__name__)
 
 
 def get_textbelt_quota() -> int:
@@ -22,10 +24,11 @@ def get_textbelt_quota() -> int:
 
     data = response.json()
     if not data["success"]:
+        logger.error("Failed to retrieve quota")
         raise RuntimeError("Failed to retrieve quota")
 
     quota_remaining = data.get("quotaRemaining")
-
+    logger.info(f"Textbelt quota remaining: {quota_remaining}")
     return quota_remaining
 
 
@@ -59,10 +62,10 @@ def send_water_reminder(to_number: str, message_body: str) -> int:
     result = resp.json()
 
     if not result.get("success"):
+        logger.error(f"Failed to send message: {result.get('error')}")
         raise RuntimeError(result.get("error", "SMS request failed"))
 
-    quota_remaining = result.get("quotaRemaining", "unknown")
-
+    quota_remaining = result["quotaRemaining"]
     return quota_remaining
 
 
@@ -76,10 +79,10 @@ def send_message() -> TextResponse:
 
     message_body = generate_message()
 
-    try:
-        quota_remaining = send_water_reminder(to_number, message_body)
-    except Exception:
-        raise HTTPException(status_code=500, detail="Failed to send message")
+    quota_remaining = send_water_reminder(to_number, message_body)
+    logger.info(
+        f"Text sent to {recipient_name}: {message_body} (Quota remaining: {quota_remaining})"
+    )
 
     return TextResponse(
         message_sent=message_body,
