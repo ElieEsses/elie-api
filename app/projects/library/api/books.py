@@ -3,6 +3,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException
 
 import app.projects.library.repositories.books as books
+import app.projects.library.repositories.notes as notes
 from app.projects.library.models.models import (
     BookData,
     BookResponse,
@@ -118,7 +119,7 @@ def get_notes(book_id: int, user_id: UUID = Depends(get_current_user_id)):
     """
     Get all notes for a specific book in the current user's library.
     """
-    result = books.get_notes(user_id, book_id)
+    result = notes.get_notes(user_id, book_id)
 
     if result is None:
         raise HTTPException(status_code=404, detail="Book not found")
@@ -133,7 +134,7 @@ def add_note(
     """
     Add a note to a specific book in the current user's library.
     """
-    result = books.add_note(user_id, book_id, note_data)
+    result = notes.add_note(user_id, book_id, note_data)
 
     if result is None:
         raise HTTPException(status_code=404, detail="Book not found")
@@ -151,7 +152,7 @@ def update_note(
     """
     Update a note for a specific book in the current user's library.
     """
-    result = books.update_note(user_id, book_id, note_id, note_data)
+    result = notes.update_note(user_id, book_id, note_id, note_data)
 
     if result is None:
         raise HTTPException(status_code=404, detail="Note not found")
@@ -166,7 +167,7 @@ def delete_note(
     """
     Delete a note for a specific book in the current user's library.
     """
-    success = books.delete_note(user_id, book_id, note_id)
+    success = notes.delete_note(user_id, book_id, note_id)
 
     if not success:
         raise HTTPException(status_code=404, detail="Note not found")

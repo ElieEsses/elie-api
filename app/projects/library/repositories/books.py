@@ -3,12 +3,10 @@ from uuid import UUID
 
 from sqlalchemy import select
 
-from app.projects.library.db.db_models import Book, Library, Note
+from app.projects.library.db.db_models import Book, Library
 from app.projects.library.models.models import (
     BookData,
     BookResponse,
-    NoteCreate,
-    NoteResponse,
     ReadingProgressUpdate,
 )
 from app.shared.database import get_session
@@ -33,6 +31,7 @@ def get_all(user_id: UUID) -> list[BookResponse]:
                     "status": library_entry.status,
                     "pages_read": library_entry.pages_read,
                     "nfc_url": library_entry.nfc_url,
+                    "rating": library_entry.rating,
                 }
             )
             for book, library_entry in books
@@ -70,6 +69,7 @@ def get_by_id(user_id: UUID, book_id: int) -> BookResponse | None:
                 "status": library_entry.status,
                 "pages_read": library_entry.pages_read,
                 "nfc_url": library_entry.nfc_url,
+                "rating": library_entry.rating,
             }
         )
 
@@ -178,89 +178,23 @@ def update_progress(
             entry.status = changes["status"]
             if changes["status"] == "unread":
                 entry.pages_read = 0
+                entry.rating = 0
             elif changes["status"] == "finished":
                 # get the total number of pages from the Book table
                 if book is not None and book.num_pages is not None:
                     entry.pages_read = book.num_pages
 
+        if "rating" in changes:
+            entry.rating = changes["rating"]
+
         session.commit()
 
         logger.info(
-            "Reading progress updated: book_id=%s, pages=%s, status=%s",
+            "Reading progress updated: book_id=%s, pages=%s, status=%s, rating=%s",
             book_id,
             entry.pages_read,
             entry.status,
+            entry.rating,
         )
 
         return get_by_id(user_id, book_id)
-
-
-def get_notes(user_id: UUID, book_id: int) -> list[NoteResponse]:
-    with get_session() as session:
-        query = select(Note).where(Note.user_id == user_id, Note.book_id == book_id)
-
-        notes = session.scalars(query).all()
-
-        return [NoteResponse.model_validate(note) for note in notes]
-
-
-def add_note(user_id: UUID, book_id: int, note_data: NoteCreate) -> NoteResponse:
-    with get_session() as session:
-        note = Note(user_id=user_id, book_id=book_id, content=note_data.content)
-        session.add(note)
-        session.commit()
-        session.refresh(note)
-
-        logger.info(
-            "Note added: user_id=%s, book_id=%s, note_id=%s",
-            user_id,
-            book_id,
-            note.id,
-        )
-
-        return NoteResponse.model_validate(note)
-
-
-def delete_note(user_id: UUID, book_id: int, note_id: int) -> bool | None:
-    with get_session() as session:
-        note = session.get(Note, note_id)
-
-        if note is None or note.user_id != user_id or note.book_id != book_id:
-            return None
-
-        session.delete(note)
-        session.commit()
-
-        logger.info(
-            "Note deleted: user_id=%s, book_id=%s, note_id=%s",
-            user_id,
-            book_id,
-            note_id,
-        )
-
-    return True
-
-
-def update_note(
-    user_id: UUID, book_id: int, note_id: int, note_data: NoteCreate
-) -> NoteResponse | None:
-    with get_session() as session:
-        note = session.get(Note, note_id)
-
-        print(note)
-
-        if note is None or note.user_id != user_id or note.book_id != book_id:
-            return None
-
-        note.content = note_data.content
-        session.commit()
-        session.refresh(note)
-
-        logger.info(
-            "Note updated: user_id=%s, book_id=%s, note_id=%s",
-            user_id,
-            book_id,
-            note.id,
-        )
-
-    return NoteResponse.model_validate(note)

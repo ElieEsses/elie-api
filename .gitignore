@@ -13,4 +13,6 @@ __pycache__/
 # Ruff cache
 .ruff_cache/
 
+.pytest_cache/
+
 TODO
