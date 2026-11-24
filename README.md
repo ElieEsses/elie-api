@@ -19,6 +19,10 @@ uv sync
 
 Configure your local `.env` with the required environment variables.
 
+```bash
+cp .env.example .env
+```
+
 Start the API:
 
 ```bash
