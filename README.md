@@ -9,19 +9,28 @@ My central FastAPI backend for personal projects. A growing collection of APIs, 
 
 Built with Python, FastAPI, Pydantic, SQLAlchemy, and PostgreSQL. Hosted on Railway.
 
+## Prerequisites
+
+- Python 3.13+
+- [uv](https://docs.astral.sh/uv/getting-started/installation/)
+- [just](https://github.com/casey/just)
+
 ## Getting Started
 
 Install dependencies:
 
 ```bash
-uv sync
+uv sync --locked
 ```
 
-Configure your local `.env` with the required environment variables.
+Create a local environment file:
 
 ```bash
 cp .env.example .env
 ```
+
+Fill in the required credentials and configuration values.
+See `.env.example` for descriptions of each variable.
 
 Start the API:
 
@@ -41,7 +50,7 @@ Commands are defined in the `justfile`.
 | `just lint` | Run Ruff with automatic fixes |
 | `just token` | Get a Supabase access token |
 | `just tunnel` | Start a Cloudflare tunnel |
-| `just deploy "message"` | Lint, commit, push, and deploy |
+| `just deploy "message"` | Regenerate environment template, lint, commit, push, and deploy |
 | `just key` | Generate a secure API key |
 | `just env-example` | Duplicate .env file as .env.example without secrets|
 
