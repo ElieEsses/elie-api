@@ -24,6 +24,7 @@ class BookResponse(BaseModel):
     status: str
     pages_read: int
     nfc_url: str | None = None
+    rating: float | None = None
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -31,6 +32,7 @@ class BookResponse(BaseModel):
 class ReadingProgressUpdate(BaseModel):
     status: Literal["unread", "reading", "finished"] | None = None
     pages_read: int | None = Field(default=None, ge=0)
+    rating: float | None = Field(default=None, ge=0, le=5)
 
 
 class NoteCreate(BaseModel):

@@ -34,3 +34,7 @@ key:
 # Generate an example .env file
 env-example:
     uv run python -m dev.gen_env_example
+
+# Run automated tests
+test:
+    uv run python -m pytest

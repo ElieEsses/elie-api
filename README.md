@@ -7,7 +7,7 @@ My central FastAPI backend for personal projects. A growing collection of APIs, 
 - **Digital Library** — Book management, reading progress, notes, and NFC integration.
 - **Water Reminders** — Automated SMS reminders using Textbelt.
 
-Built with Python, FastAPI, Pydantic, SQLAlchemy, and PostgreSQL. Hosted on Railway.
+Built with Python, FastAPI, Pydantic, SQLAlchemy, and PostgreSQL.
 
 ## Prerequisites
 

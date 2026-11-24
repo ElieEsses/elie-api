@@ -47,6 +47,7 @@ class Library(Base):
     nfc_url: Mapped[str] = mapped_column(
         nullable=False, default="https://library.app.elie-esses.com/library"
     )
+    rating: Mapped[float] = mapped_column(nullable=False, default=0)
 
 
 class Note(Base):
