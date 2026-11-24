@@ -96,7 +96,7 @@ def add(user_id: UUID, book_data: BookData) -> BookResponse | None:
                 raise ValueError("This book is already in your library")
 
         # if the book is not in the user's library, add it
-        nfc_url = f"https://library.app.elie-esses.com/library/{book.id}"
+        nfc_url = f"https://app.elie-esses.com/library/{book.id}"
         library_entry = Library(user_id=user_id, book_id=book.id, nfc_url=nfc_url)
 
         session.add(library_entry)
