@@ -43,6 +43,7 @@ Commands are defined in the `justfile`.
 | `just tunnel` | Start a Cloudflare tunnel |
 | `just deploy "message"` | Lint, commit, push, and deploy |
 | `just key` | Generate a secure API key |
+| `just env-example` | Duplicate .env file as .env.example without secrets|
 
 Run `just --list` to see all commands.
 
