@@ -6,6 +6,9 @@ if [[ "$(git branch --show-current)" != "dev" ]]; then
     exit 1
 fi
 
+echo "Generating .env.example..."
+just env-example
+
 echo "Linting and formatting code..."
 uv run ruff check . --fix
 uv run ruff format .
