@@ -30,3 +30,7 @@ deploy message="Update":
 # Generate a secure API key
 key:
     openssl rand -hex 32
+
+# Generate an example .env file
+env-example:
+    uv run python -m dev.gen_env_example
