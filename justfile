@@ -1,40 +1,43 @@
 
-# List available commands
+# list available commands
 default:
     @just --list
 
-# Get Supabase token
+# get supabase token
 token:
     uv run python -m dev.get_token
 
-# Run Ruff linter
+# run ruff linter
 lint:
     uv run ruff check . --fix
-# Run Ruff formatter
 
+# run ruff formatter
 format:
     uv run ruff format .
+
+# lint and format
+check: lint format
     
-# Start FastAPI server
+# start fastapi server
 run:
     uv run uvicorn app.main:app --reload
 
-# Start Cloudflare tunnel
+# start cloudflare tunnel
 tunnel:
     cloudflared tunnel --url http://localhost:8000
 
-# Deploy with an optional commit message
+# deploy with an optional commit message
 deploy message="Update":
     ./dev/deploy.sh "{{message}}"
 
-# Generate a secure API key
+# generate a secure API key
 key:
     openssl rand -hex 32
 
-# Generate an example .env file
+# generate an example .env file
 env-example:
     uv run python -m dev.gen_env_example
 
-# Run automated tests
+# run automated tests
 test:
     uv run python -m pytest
