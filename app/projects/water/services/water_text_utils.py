@@ -61,7 +61,7 @@ def send_water_reminder(to_number: str, message_body: str) -> int:
     result = resp.json()
 
     if not result.get("success"):
-        logger.error(f"Failed to send message: {result.get('error')}")
+        logger.error(f"Failed to send message: \"{message_body}\", {result.get('error')}")
         raise RuntimeError(result.get("error", "SMS request failed"))
 
     quota_remaining = result["quotaRemaining"]
